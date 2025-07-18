@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Synonym Match Game</title>
+  <style>
+    #synonym-game {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff8dc;
+      border: 3px solid #ffa500;
+      border-radius: 15px;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6347;
+      font-size: 2em;
+    }
+
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .column {
+      width: 45%;
+      min-width: 150px;
+      margin: 10px 0;
+    }
+
+    .word-box {
+      background: #add8e6;
+      padding: 12px;
+      margin: 10px;
+      text-align: center;
+      border-radius: 10px;
+      font-size: 1.2em;
+      cursor: grab;
+      border: 2px solid #0077be;
+    }
+
+    .drop-zone {
+      background: #ffe4e1;
+      border: 2px dashed #ff69b4;
+      padding: 12px;
+      margin: 10px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.2em;
+      min-height: 40px;
+    }
+
+    .drop-zone.correct {
+      background: #90ee90;
+      border-color: #008000;
+    }
+
+    .drop-zone.incorrect {
+      background: #f08080;
+      border-color: #b22222;
+    }
+
+    @media (max-width: 600px) {
+      .columns {
+        flex-direction: column;
+        align-items: center;
+      }
+      .column {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="synonym-game">
+    <h2>Match the Synonyms!</h2>
+    <div class="columns">
+      <div class="column" id="words">
+        <div class="word-box" draggable="true" tabindex="0" data-word="happy">Happy</div>
+        <div class="word-box" draggable="true" tabindex="0" data-word="big">Big</div>
+        <div class="word-box" draggable="true" tabindex="0" data-word="fast">Fast</div>
+        <div class="word-box" draggable="true" tabindex="0" data-word="cold">Cold</div>
+        <div class="word-box" draggable="true" tabindex="0" data-word="smart">Smart</div>
+      </div>
+      <div class="column" id="synonyms">
+        <div class="drop-zone" data-match="smart">Clever</div>
+        <div class="drop-zone" data-match="cold">Chilly</div>
+        <div class="drop-zone" data-match="happy">Glad</div>
+        <div class="drop-zone" data-match="big">Large</div>
+        <div class="drop-zone" data-match="fast">Quick</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const draggables = document.querySelectorAll('.word-box');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    draggables.forEach(item => {
+      item.addEventListener('dragstart', e => {
+        e.dataTransfer.setData("text/plain", item.dataset.word);
+      });
+
+      item.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const selected = document.querySelector('.selected');
+          if (selected) selected.classList.remove('selected');
+          item.classList.add('selected');
+        }
+      });
+    });
+
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const draggedWord = e.dataTransfer.getData("text/plain");
+        checkMatch(zone, draggedWord);
+      });
+
+      zone.addEventListener('click', () => {
+        const selected = document.querySelector('.selected');
+        if (selected) {
+          const word = selected.dataset.word;
+          checkMatch(zone, word);
+          selected.classList.remove('selected');
+        }
+      });
+    });
+
+    function checkMatch(zone, word) {
+      if (zone.dataset.match === word) {
+        zone.textContent = zone.textContent + " ✓";
+        zone.classList.add('correct');
+        zone.classList.remove('incorrect');
+        const matchedItem = document.querySelector(`[data-word="${word}"]`);
+        matchedItem.setAttribute("draggable", "false");
+        matchedItem.style.opacity = 0.5;
+      } else {
+        zone.classList.add('incorrect');
+        setTimeout(() => zone.classList.remove('incorrect'), 1000);
+      }
+    }
+  </script>
+</body>
+</html>
