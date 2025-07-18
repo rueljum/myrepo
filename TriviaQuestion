@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧠 True or False Trivia Time!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    
+    .brain-icon {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .question-card {
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .btn-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .correct-answer {
+      animation: correctPulse 0.6s ease-out;
+    }
+    
+    .wrong-answer {
+      animation: wrongShake 0.6s ease-out;
+    }
+    
+    @keyframes correctPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: white;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+    }
+
+    .header-img {
+      max-width: 150px;
+      margin: 20px auto;
+    }
+
+    .question-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      margin: 20px auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @media (max-width: 768px) {
+      .question-box {
+        padding: 20px;
+        margin: 15px auto;
+        border-radius: 15px;
+      }
+    }
+
+    button {
+      margin: 8px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      font-size: clamp(1rem, 2.5vw, 1.1rem);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      min-height: 48px;
+      min-width: 120px;
+    }
+
+    @media (max-width: 768px) {
+      button {
+        margin: 6px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 280px;
+      }
+    }
+
+    #restart-btn {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      font-size: 1.2rem;
+      padding: 15px 40px;
+      box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+    }
+
+    #restart-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(46, 204, 113, 0.4);
+    }
+
+    .feedback {
+      font-weight: bold;
+      margin-top: 15px;
+      font-size: 1.2rem;
+    }
+
+    .progress-bar {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 15px;
+      height: 12px;
+      margin: 25px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      border-radius: 15px;
+      transition: width 0.5s ease;
+    }
+
+    .score-display {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .true-btn {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+    }
+
+    .true-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(46, 204, 113, 0.4);
+    }
+
+    .false-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+    }
+
+    .false-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(231, 76, 60, 0.4);
+    }
+
+    .brain-icon {
+      font-size: 4rem;
+      margin: 20px 0;
+    }
+
+    .result-icon {
+      font-size: 5rem;
+      margin: 20px 0;
+    }
+
+    .explanation {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      color: #555;
+      line-height: 1.6;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .question-text {
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      color: #333;
+      margin: 20px 0;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .question-text {
+        margin: 15px 0;
+        line-height: 1.4;
+      }
+      
+      .brain-icon {
+        font-size: 3rem;
+      }
+      
+      .result-icon {
+        font-size: 4rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .results-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      
+      .brain-icon {
+        font-size: 2.5rem;
+      }
+      
+      .result-icon {
+        font-size: 3rem;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+
+    .completion-message {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      margin: 20px 0;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 True or False Trivia Time!</h1>
+    
+    <div id="quiz-container" class="question-box">
+      <!-- Questions will be loaded here dynamically -->
+    </div>
+
+    <div class="button-container" style="margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+      <button id="home-btn" onclick="goHome()" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: clamp(1rem, 2.5vw, 1.2rem); padding: 15px 40px; box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); display: none;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 25px rgba(52, 152, 219, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(52, 152, 219, 0.3)'">🏠 Back to Home</button>
+      <button id="restart-btn" onclick="startQuiz()" style="font-size: clamp(1rem, 2.5vw, 1.2rem); padding: 15px 40px;">🔁 Start Quiz</button>
+      <button id="reshuffle-btn" onclick="reshuffleQuiz()" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; font-size: clamp(1rem, 2.5vw, 1.2rem); padding: 15px 40px; box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 25px rgba(155, 89, 182, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(155, 89, 182, 0.3)'">🔀 Reshuffle Questions</button>
+      <button id="reset-btn" onclick="resetQuiz()" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; font-size: clamp(1rem, 2.5vw, 1.2rem); padding: 15px 40px; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 25px rgba(230, 126, 34, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(230, 126, 34, 0.3)'">🔄 Reset Questions</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { text: "🌊 Florida has a longer coastline than California.", answer: true, explanation: "Florida has 1,350 miles of coastline compared to California's 840 miles!" },
+      { text: "🗣️ Maine is the only state whose name has just one syllable.", answer: true, explanation: "All other U.S. state names have two or more syllables - Maine stands alone!" },
+      { text: "🌀 The Everglades is actually a slow-moving river.", answer: true, explanation: "The Everglades is often called a 'river of grass' - it's a very wide, slow-moving sheet of water!" },
+      { text: "🦅 Bald eagles wear toupees when they get older.", answer: false, explanation: "This is just silly! Bald eagles don't actually go bald - their white head feathers develop as they mature." },
+      { text: "🎤 A parrot once sang the U.S. national anthem at the Super Bowl.", answer: false, explanation: "While parrots can learn songs, no parrot has ever performed at the Super Bowl halftime show!" },
+      { text: "🦕 Dinosaurs existed longer than humans have (so far).", answer: true, explanation: "Dinosaurs ruled Earth for about 165 million years, while humans have only existed for about 300,000 years!" },
+      { text: "🍽️ You can survive 20 days without food but only 2 without water.", answer: true, explanation: "The human body can survive weeks without food but only 2-3 days without water!" },
+      { text: "🦴 More than half your bones are in your hands and feet.", answer: true, explanation: "Out of 206 bones in the adult human body, 106 are in your hands and feet!" },
+      { text: "🌪️ The U.S. has more tornadoes than any other country.", answer: true, explanation: "The U.S. experiences about 1,000-1,200 tornadoes per year, more than anywhere else on Earth!" },
+      { text: "❄️ Snowflakes are actually colorless. They look white because of light reflection.", answer: true, explanation: "Snowflakes are made of ice, which is colorless. They appear white due to light scattering!" },
+      { text: "👋 The pinkie has the strongest muscle in the body.", answer: false, explanation: "The jaw muscle (masseter) is actually the strongest muscle in the human body!" },
+      { text: "🎵 Crickets chirp faster in warm weather.", answer: true, explanation: "Cricket chirping speed increases with temperature - you can estimate temperature by counting chirps!" },
+      { text: "🍯 Honey is the only food that never spoils.", answer: true, explanation: "Honey's low moisture and acidic pH make it naturally antimicrobial - it can last thousands of years!" },
+      { text: "🐙 Octopuses have three hearts.", answer: true, explanation: "Two hearts pump blood to the gills, and one pumps blood to the rest of the body!" },
+      { text: "🌙 The moon is moving away from Earth every year.", answer: true, explanation: "The moon moves about 1.5 inches (3.8 cm) away from Earth each year!" },
+      { text: "🦈 Sharks are older than trees.", answer: true, explanation: "Sharks have existed for about 400 million years, while trees appeared around 350 million years ago!" },
+      { text: "🍌 Bananas are radioactive.", answer: true, explanation: "Bananas contain potassium-40, a naturally occurring radioactive isotope!" },
+      { text: "🐧 Penguins can fly backwards.", answer: false, explanation: "Penguins can't fly at all! They're flightless birds that 'fly' underwater instead." },
+      { text: "🧠 You only use 10% of your brain.", answer: false, explanation: "This is a myth! Brain scans show we use virtually all of our brain, even during simple tasks." },
+      { text: "🌍 Australia is wider than the moon.", answer: true, explanation: "Australia is about 4,000 km wide, while the moon's diameter is about 3,474 km!" },
+      { text: "🦒 Giraffes have the same number of neck bones as humans.", answer: true, explanation: "Both giraffes and humans have exactly 7 cervical vertebrae - giraffes' are just much longer!" },
+      { text: "🍓 Strawberries have more vitamin C than oranges.", answer: true, explanation: "Strawberries contain about 89mg of vitamin C per cup, compared to 70mg in oranges!" },
+      { text: "🌵 Cacti store water in their stems, not leaves.", answer: true, explanation: "Cactus spines are modified leaves, while the thick stems store water for survival!" },
+      { text: "🦋 Butterflies taste with their feet.", answer: true, explanation: "Butterflies have taste receptors on their feet to identify suitable plants for laying eggs!" },
+      { text: "🐘 Elephants are afraid of mice.", answer: false, explanation: "This is a myth! Elephants aren't particularly afraid of mice, though they may be startled by sudden movements." },
+      { text: "🌟 The sun is a star.", answer: true, explanation: "The sun is a medium-sized star - it just appears different because it's much closer to us!" },
+      { text: "🦎 Chameleons change color to match their surroundings.", answer: false, explanation: "Chameleons change color mainly to communicate emotions and regulate temperature, not for camouflage!" },
+      { text: "🍎 An apple a day keeps the doctor away is scientifically proven.", answer: false, explanation: "While apples are healthy, this saying is just a folk wisdom - not a scientific fact!" },
+      { text: "🐨 Koalas sleep 20 hours a day.", answer: true, explanation: "Koalas sleep 18-22 hours daily to conserve energy from their low-nutrition eucalyptus diet!" },
+      { text: "🌈 You can see a rainbow at night.", answer: true, explanation: "Moonbows (lunar rainbows) can occur at night when moonlight hits water droplets!" },
+      { text: "🦆 Ducks' quacks don't echo.", answer: false, explanation: "This is a myth! Duck quacks do echo, but the echo is often hard to distinguish from the original sound." },
+      { text: "🍕 Pizza was invented in Italy.", answer: true, explanation: "Modern pizza originated in Naples, Italy, in the 18th-19th century!" },
+      { text: "🐢 Turtles can breathe through their butts.", answer: true, explanation: "Some turtles can absorb oxygen through their cloaca (rear opening) when underwater!" },
+      { text: "🌊 The Pacific Ocean is larger than all land masses combined.", answer: true, explanation: "The Pacific Ocean covers about 165 million km², while all land is about 149 million km²!" },
+      { text: "🦘 Kangaroos can't walk backwards.", answer: true, explanation: "Kangaroos' large tail and powerful hind legs make it nearly impossible for them to move backwards!" },
+      { text: "🍫 Chocolate is toxic to dogs.", answer: true, explanation: "Chocolate contains theobromine, which dogs can't metabolize properly and can be poisonous!" },
+      { text: "🐠 Goldfish have a 3-second memory.", answer: false, explanation: "Goldfish can actually remember things for months, not seconds!" },
+      { text: "🌋 There are more volcanoes underwater than on land.", answer: true, explanation: "About 75% of all volcanic activity occurs underwater along mid-ocean ridges!" },
+      { text: "🦇 Bats are blind.", answer: false, explanation: "Bats can see! While they use echolocation, most bats have perfectly good eyesight." },
+      { text: "🍊 Orange was named after the fruit, not the other way around.", answer: true, explanation: "The color orange was named after the fruit - before that, it was called 'red-yellow'!" },
+      { text: "🐍 Snakes can't close their eyes.", answer: true, explanation: "Snakes don't have eyelids! They have a transparent scale called a spectacle that protects their eyes." },
+      { text: "🌸 Cherry blossoms are edible.", answer: true, explanation: "Cherry blossoms (sakura) are edible and used in Japanese cuisine for teas, desserts, and pickles!" },
+      { text: "🦉 Owls can turn their heads 360 degrees.", answer: false, explanation: "Owls can only turn their heads about 270 degrees - impressive, but not a full circle!" },
+      { text: "🍄 Mushrooms are more closely related to animals than plants.", answer: true, explanation: "Fungi (including mushrooms) share a more recent common ancestor with animals than with plants!" },
+      { text: "🐋 Blue whales' hearts are as big as a car.", answer: true, explanation: "A blue whale's heart can weigh as much as a small car and is about the size of a golf cart!" },
+      { text: "🌙 There's no gravity on the moon.", answer: false, explanation: "The moon has gravity - about 1/6th of Earth's gravity. That's why astronauts bounce when they walk!" },
+      { text: "🦀 Crabs walk sideways because they have to.", answer: true, explanation: "Crabs' leg joints bend outward, making sideways movement much more efficient than forward motion!" },
+      { text: "🍒 Cherries are berries but strawberries aren't.", answer: false, explanation: "Actually, strawberries aren't berries, but neither are cherries! Botanically, bananas are berries!" },
+      { text: "🐜 Ants never sleep.", answer: true, explanation: "Ants don't sleep like humans do - they take hundreds of tiny power naps throughout the day!" },
+      { text: "🌊 The Dead Sea is actually a lake.", answer: true, explanation: "The Dead Sea is a salt lake bordered by Jordan and Israel - it's not connected to any ocean!" },
+      { text: "🦚 Only male peacocks have colorful feathers.", answer: true, explanation: "Male peacocks have the brilliant plumage - females (peahens) are brown and more subdued!" },
+      { text: "🍇 Grapes explode in the microwave.", answer: true, explanation: "Grapes can create plasma and spark in the microwave due to their size and water content!" },
+      { text: "🐺 Wolves howl at the moon.", answer: false, explanation: "Wolves howl to communicate with their pack, not at the moon - it just seems that way!" },
+      { text: "🌿 Bamboo is the fastest-growing plant on Earth.", answer: true, explanation: "Some bamboo species can grow up to 35 inches (91 cm) in a single day!" },
+      { text: "🦭 Seals can sleep underwater.", answer: true, explanation: "Seals can sleep underwater by floating and surfacing to breathe without fully waking up!" },
+      { text: "🍑 Peaches are native to China.", answer: true, explanation: "Peaches originated in China over 8,000 years ago and spread along the Silk Road!" },
+      { text: "🐸 Frogs drink water through their skin.", answer: true, explanation: "Frogs absorb water through their permeable skin rather than drinking through their mouths!" },
+      { text: "🌨️ No two snowflakes are exactly alike.", answer: true, explanation: "The conditions each snowflake experiences as it forms are so unique that no two are identical!" },
+      { text: "🦌 Reindeer eyes change color with the seasons.", answer: true, explanation: "Reindeer eyes are golden in summer and blue in winter to adapt to different light conditions!" },
+      { text: "🍰 Cake was originally made as an offering to gods.", answer: true, explanation: "Ancient civilizations made sweet breads and cakes as offerings to their deities!" },
+      { text: "🐙 Octopuses are colorblind.", answer: false, explanation: "Recent research suggests octopuses can see color, despite having only one type of color receptor!" },
+      { text: "🌍 Earth's core is hotter than the sun's surface.", answer: true, explanation: "Earth's core reaches 6,000°C (10,800°F), while the sun's surface is about 5,500°C (9,900°F)!" },
+      { text: "🦜 Parrots can live over 100 years.", answer: true, explanation: "Some large parrot species, like macaws, can live 80-100+ years with proper care!" },
+      { text: "🍪 Fortune cookies were invented in China.", answer: false, explanation: "Fortune cookies were actually invented in California by Japanese-American immigrants!" },
+      { text: "🦀 Lobsters were once considered prison food.", answer: true, explanation: "In colonial America, lobsters were so abundant they were fed to prisoners and considered cruel punishment!" },
+      { text: "🌙 A day on Venus is longer than its year.", answer: true, explanation: "Venus takes 243 Earth days to rotate once but only 225 Earth days to orbit the Sun!" },
+      { text: "🐝 Bees can recognize human faces.", answer: true, explanation: "Bees use the same methods they use to identify different flowers to recognize human faces!" },
+      { text: "🍎 Apples float in water because they're 25% air.", answer: true, explanation: "Apples are made up of about 25% air, which is why they float when you bob for apples!" },
+      { text: "🦎 Geckos can walk on water.", answer: true, explanation: "Geckos can run across water surfaces using surface tension and their lightweight bodies!" },
+      { text: "🌶️ Birds can't taste spicy food.", answer: true, explanation: "Birds lack the receptors to taste capsaicin, so they can eat the spiciest peppers without feeling heat!" },
+      { text: "🐧 There are penguins that live in Africa.", answer: true, explanation: "African penguins live along the coast of South Africa and Namibia!" },
+      { text: "🌊 The Great Wall of China is visible from space.", answer: false, explanation: "This is a myth! The Great Wall is not visible from space with the naked eye." },
+      { text: "🦘 Baby kangaroos are only 2 centimeters long when born.", answer: true, explanation: "Newborn kangaroos are about the size of a lima bean and crawl into their mother's pouch!" },
+      { text: "🍌 Bananas grow on trees.", answer: false, explanation: "Bananas actually grow on the world's largest herb plant, not a tree!" },
+      { text: "🐻 Polar bears have black skin.", answer: true, explanation: "Under their white fur, polar bears have black skin to help absorb heat from the sun!" },
+      { text: "🌍 Antarctica is the world's largest desert.", answer: true, explanation: "Antarctica is technically a desert because it receives very little precipitation!" },
+      { text: "🦆 Ducks have waterproof feathers.", answer: true, explanation: "Ducks produce oil from a gland that they spread on their feathers to make them waterproof!" },
+      { text: "🍓 Strawberries aren't berries, but rhubarb is a vegetable.", answer: false, explanation: "Strawberries aren't berries, but rhubarb is actually a vegetable, not a fruit!" },
+      { text: "🐙 Octopuses have blue blood.", answer: true, explanation: "Octopuses use copper-based blood (hemocyanin) instead of iron-based, making it blue!" },
+      { text: "🌙 The moon has moonquakes.", answer: true, explanation: "The moon experiences seismic activity called moonquakes, some lasting for hours!" },
+      { text: "🦋 Monarch butterflies migrate 3,000 miles.", answer: true, explanation: "Monarch butterflies travel up to 3,000 miles from Canada to Mexico each winter!" },
+      { text: "🐘 Elephants are the only mammals that can't jump.", answer: true, explanation: "Elephants are too heavy and their leg structure prevents them from jumping!" },
+      { text: "🍯 A bee visits 2 million flowers to make one pound of honey.", answer: true, explanation: "Bees must visit about 2 million flowers and fly 55,000 miles to produce one pound of honey!" },
+      { text: "🌟 The sun makes a sound.", answer: true, explanation: "The sun produces sound waves, but space is a vacuum so we can't hear them on Earth!" },
+      { text: "🦒 Giraffes only need 5-30 minutes of sleep per day.", answer: true, explanation: "Giraffes have one of the shortest sleep requirements of any mammal!" },
+      { text: "🐠 Fish can drown.", answer: true, explanation: "Fish can drown if there isn't enough dissolved oxygen in the water!" },
+      { text: "🌈 Rainbows are actually full circles.", answer: true, explanation: "Rainbows are complete circles, but we usually only see the arc because the ground blocks the bottom half!" },
+      { text: "🦇 Vampire bats share blood with hungry friends.", answer: true, explanation: "Vampire bats will regurgitate blood to feed hungry roost-mates who couldn't find food!" },
+      { text: "🍊 Oranges are naturally orange.", answer: false, explanation: "Oranges are naturally green! They turn orange in cooler climates or are treated with gas." },
+      { text: "🐨 Koala fingerprints are almost identical to human fingerprints.", answer: true, explanation: "Koala fingerprints are so similar to humans that they could confuse crime scene investigators!" },
+      { text: "🌊 Sharks existed before Saturn's rings.", answer: true, explanation: "Sharks have existed for 400+ million years, while Saturn's rings formed only 100-200 million years ago!" },
+      { text: "🦜 Parrots name their babies.", answer: true, explanation: "Parent parrots give their chicks unique 'signature calls' that act like names!" },
+      { text: "🍎 Eating carrots improves your night vision.", answer: false, explanation: "This was WWII propaganda! Carrots are healthy but don't significantly improve night vision." },
+      { text: "🐢 Some turtles can live over 200 years.", answer: true, explanation: "Giant tortoises can live well over 200 years, with some reaching 300+ years!" },
+      { text: "🌙 There's a giant cloud of alcohol in space.", answer: true, explanation: "There's a cloud of methyl alcohol in space that's 1,000 times larger than our solar system!" },
+      { text: "🦘 Kangaroos can pause their pregnancies.", answer: true, explanation: "Kangaroos can delay the development of their embryo until conditions are right!" },
+      { text: "🐝 Honey never expires if stored properly.", answer: true, explanation: "Archaeologists have found 3,000-year-old honey that's still perfectly edible!" },
+      { text: "🌍 Earth's rotation is slowing down.", answer: true, explanation: "Earth's rotation slows by about 1.7 milliseconds per century due to tidal friction!" },
+      { text: "🦆 Rubber ducks help scientists study ocean currents.", answer: true, explanation: "In 1992, 29,000 rubber ducks fell off a ship and helped scientists track ocean currents!" },
+      { text: "🍌 Humans share 50% of their DNA with bananas.", answer: true, explanation: "We share about 50% of our DNA with bananas because all life has common origins!" },
+      { text: "🐙 Octopuses can taste with their arms.", answer: true, explanation: "Octopus arms have taste receptors, so they can taste everything they touch!" },
+      { text: "🌟 You can see other galaxies with the naked eye.", answer: true, explanation: "The Andromeda Galaxy is visible to the naked eye on clear, dark nights!" },
+      { text: "🦎 Chameleons' tongues are twice as long as their bodies.", answer: true, explanation: "A chameleon's tongue can extend up to twice its body length to catch prey!" }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let gameStarted = false;
+    
+    // Store original questions order
+    const originalQuestions = [...questions];
+    let shuffledQuestions = [...questions];
+
+    function startQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      gameStarted = true;
+      document.getElementById('restart-btn').textContent = '🔁 Restart Quiz';
+      document.getElementById("restart-btn").style.display = "none";
+      document.getElementById("reshuffle-btn").style.display = "none";
+      document.getElementById("reset-btn").style.display = "none";
+      document.getElementById("home-btn").style.display = "inline-block";
+      showQuestion();
+    }
+
+    function goHome() {
+      currentQuestion = 0;
+      score = 0;
+      gameStarted = false;
+      document.getElementById('restart-btn').textContent = '🔁 Start Quiz';
+      document.getElementById("restart-btn").style.display = "inline-block";
+      document.getElementById("reshuffle-btn").style.display = "inline-block";
+      document.getElementById("reset-btn").style.display = "inline-block";
+      document.getElementById("home-btn").style.display = "none";
+      document.getElementById("home-btn").style.display = "none";
+      showWelcome();
+    }
+
+    function reshuffleQuiz() {
+      // Fisher-Yates shuffle algorithm
+      shuffledQuestions = [...originalQuestions];
+      for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+      }
+      
+      // Update the questions array with shuffled order
+      for (let i = 0; i < questions.length; i++) {
+        questions[i] = shuffledQuestions[i];
+      }
+      
+      // Show confirmation message
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = `
+        <div style="text-center;">
+          <div style="font-size: 4rem; margin: 25px 0;">🔀</div>
+          <h2 style="color: #9b59b6; font-size: 2rem; margin: 25px 0; font-weight: 600;">Questions Reshuffled!</h2>
+          <p style="color: #666; font-size: 1.2rem; margin: 25px 0; line-height: 1.6;">
+            All ${questions.length} questions have been randomly shuffled for a fresh challenge!
+          </p>
+          <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 20px; padding: 25px; margin: 25px 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <p style="color: #555; font-size: 1.1rem; margin: 0;">Ready to test your knowledge with a new question order?</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function resetQuiz() {
+      // Reset questions to original order
+      for (let i = 0; i < originalQuestions.length; i++) {
+        questions[i] = originalQuestions[i];
+      }
+      
+      // Show confirmation message
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = `
+        <div style="text-center;">
+          <div style="font-size: 4rem; margin: 25px 0;">🔄</div>
+          <h2 style="color: #e67e22; font-size: 2rem; margin: 25px 0; font-weight: 600;">Questions Reset!</h2>
+          <p style="color: #666; font-size: 1.2rem; margin: 25px 0; line-height: 1.6;">
+            All questions have been restored to their original order.
+          </p>
+          <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 20px; padding: 25px; margin: 25px 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <p style="color: #555; font-size: 1.1rem; margin: 0;">Questions are back in their original sequence!</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function showQuestion() {
+      if (currentQuestion >= questions.length) {
+        showResults();
+        return;
+      }
+
+      const container = document.getElementById('quiz-container');
+      const q = questions[currentQuestion];
+      
+      container.innerHTML = `
+        <div class="question-card">
+          <div style="margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                Question ${currentQuestion + 1} of ${questions.length}
+              </span>
+              <span style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                Score: ${score}/${currentQuestion}
+              </span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${((currentQuestion) / questions.length) * 100}%"></div>
+            </div>
+          </div>
+          
+          <p class="question-text">${q.text}</p>
+          
+          <div style="margin: 30px 0;">
+            <button onclick="answerQuestion(true)" class="true-btn">✅ TRUE</button>
+            <button onclick="answerQuestion(false)" class="false-btn">❌ FALSE</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function answerQuestion(userAnswer) {
+      const q = questions[currentQuestion];
+      const isCorrect = userAnswer === q.answer;
+      
+      if (isCorrect) {
+        score++;
+      }
+
+      showFeedback(isCorrect, q.explanation);
+    }
+
+    function showFeedback(isCorrect, explanation) {
+      const container = document.getElementById('quiz-container');
+      const resultClass = isCorrect ? 'correct-answer' : 'wrong-answer';
+      const resultColor = isCorrect ? '#2ecc71' : '#e74c3c';
+      const resultIcon = isCorrect ? '🎉' : '😅';
+      const resultText = isCorrect ? 'Correct!' : 'Not quite!';
+      
+      container.innerHTML = `
+        <div class="${resultClass}">
+          <div style="text-center;">
+            <div class="result-icon">${resultIcon}</div>
+            <h2 style="color: ${resultColor}; font-size: 2rem; margin: 20px 0; font-weight: 700;">${resultText}</h2>
+            <div class="explanation">
+              <p style="font-size: 1.1rem; margin: 0;">${explanation}</p>
+            </div>
+            <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 15px; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+              <p style="color: #333; font-weight: 600; margin: 0; font-size: 1.1rem;">
+                Current Score: ${score}/${currentQuestion + 1}
+              </p>
+            </div>
+          </div>
+          
+          <div style="text-center; margin-top: 25px;">
+            <button onclick="nextQuestion()" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 25px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.3)'">
+              ${currentQuestion + 1 >= questions.length ? '🏆 See Final Results' : '➡️ Next Question'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      showQuestion();
+    }
+
+    function showResults() {
+      const container = document.getElementById('quiz-container');
+      const percentage = Math.round((score / questions.length) * 100);
+      let resultMessage, resultIcon, resultColor;
+      
+      if (percentage >= 80) {
+        resultMessage = "Outstanding! You're a trivia master!";
+        resultIcon = "🏆";
+        resultColor = "#f39c12";
+      } else if (percentage >= 60) {
+        resultMessage = "Great job! You know your facts!";
+        resultIcon = "🌟";
+        resultColor = "#2ecc71";
+      } else if (percentage >= 40) {
+        resultMessage = "Not bad! Keep learning!";
+        resultIcon = "👍";
+        resultColor = "#3498db";
+      } else {
+        resultMessage = "Keep trying! Practice makes perfect!";
+        resultIcon = "💪";
+        resultColor = "#9b59b6";
+      }
+      
+      container.innerHTML = `
+        <div style="text-center;">
+          <div style="font-size: 6rem; margin: 20px 0;">${resultIcon}</div>
+          <h2 style="color: ${resultColor}; font-size: 2.5rem; margin: 20px 0; font-weight: 700;">Quiz Complete!</h2>
+          <div style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,249,250,0.9)); border-radius: 20px; padding: 30px; margin: 25px 0; box-shadow: 0 15px 30px rgba(0,0,0,0.1);">
+            <div style="font-size: 4rem; font-weight: 700; color: #333; margin-bottom: 15px;">${score}/${questions.length}</div>
+            <div style="font-size: 1.8rem; font-weight: 600; color: #666; margin-bottom: 20px;">${percentage}% Correct</div>
+            <p style="color: ${resultColor}; font-weight: 600; font-size: 1.3rem; margin: 0;">${resultMessage}</p>
+          </div>
+          
+          <div class="results-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0;">
+            <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); border-radius: 15px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+              <div style="font-size: 2.5rem; font-weight: 700; color: #155724; margin-bottom: 8px;">${score}</div>
+              <div style="color: #155724; font-weight: 600;">Correct Answers</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f8d7da, #f1b0b7); border-radius: 15px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+              <div style="font-size: 2.5rem; font-weight: 700; color: #721c24; margin-bottom: 8px;">${questions.length - score}</div>
+              <div style="color: #721c24; font-weight: 600;">Incorrect Answers</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById("restart-btn").style.display = "inline-block";
+      document.getElementById("reshuffle-btn").style.display = "inline-block";
+      document.getElementById("reset-btn").style.display = "inline-block";
+      document.getElementById("home-btn").style.display = "none";
+    }
+
+    function showWelcome() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = `
+        <div style="text-center;">
+          <div style="font-size: 5rem; margin: 25px 0;">🤔</div>
+          <h2 style="color: #333; font-size: 2rem; margin: 25px 0; font-weight: 600;">Ready to Test Your Knowledge?</h2>
+          <p style="color: #666; font-size: 1.2rem; margin: 25px 0; line-height: 1.6;">
+            Challenge yourself with ${questions.length} fascinating true or false questions! 
+            Learn amazing facts while testing what you think you know.
+          </p>
+
+        </div>
+      `;
+    }
+
+    // Initialize the welcome screen
+    showWelcome();
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'960f632cb25e2f47',t:'MTc1MjgxNDUzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
